@@ -7,6 +7,7 @@
 package service
 
 import (
+	"html/template"
 	"logger"
 	"model"
 	"strconv"
@@ -105,6 +106,19 @@ func FindTopicsByNid(nid, curTid string) (topics []*model.Topic) {
 	if err != nil {
 		logger.Errorln("topic service FindTopicsByNid Error:", err)
 		return
+	}
+	return
+}
+
+// 获得社区最新公告
+func FindNoticeTopic() (topic *model.Topic) {
+	topics, err := model.NewTopic().Where("nid=15").Limit("0,1").Order("mtime DESC").FindAll()
+	if err != nil {
+		logger.Errorln("topic service FindTopicsByNid Error:", err)
+		return
+	}
+	if len(topics) > 0 {
+		topic = topics[0]
 	}
 	return
 }
@@ -264,6 +278,32 @@ func FindTopicsByTids(tids []int) []*model.Topic {
 	return topics
 }
 
+// 获得热门节点
+func FindHotNodes() []map[string]interface{} {
+	strSql := "SELECT nid, COUNT(1) AS topicnum FROM topics GROUP BY nid ORDER BY topicnum DESC LIMIT 10"
+	rows, err := model.NewTopic().DoSql(strSql)
+	if err != nil {
+		logger.Errorln("topic service FindHotNodes error:", err)
+		return nil
+	}
+	nodes := make([]map[string]interface{}, 0, 10)
+	for rows.Next() {
+		var nid, topicnum int
+		err = rows.Scan(&nid, &topicnum)
+		if err != nil {
+			logger.Errorln("rows.Scan error:", err)
+			continue
+		}
+		name := model.GetNodeName(nid)
+		node := map[string]interface{}{
+			"name": name,
+			"nid":  nid,
+		}
+		nodes = append(nodes, node)
+	}
+	return nodes
+}
+
 // 增加话题浏览数（TODO:刷屏暂时不处理）
 func IncrTopicView(tid string, uid int) {
 	model.NewTopicEx().Where("tid="+tid).Increment("view", 1)
@@ -274,9 +314,17 @@ func TopicsTotal() (total int) {
 	total, err := model.NewTopic().Count()
 	if err != nil {
 		logger.Errorln("topic service TopicsTotal error:", err)
-		return
 	}
 	return
+}
+
+// 安全过滤
+func JSEscape(topics []*model.Topic) []*model.Topic {
+	for i, topic := range topics {
+		topics[i].Title = template.JSEscapeString(topic.Title)
+		topics[i].Content = template.JSEscapeString(topic.Content)
+	}
+	return topics
 }
 
 // 话题回复（评论）

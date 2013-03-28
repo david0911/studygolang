@@ -161,6 +161,7 @@
 {{end}}
 {{define "js"}}
 <script type="text/javascript" src="/static/js/topics.js"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
 <script type="text/javascript" src="/static/js/Markdown.Converter.js"></script>
 <script type="text/javascript" src="/static/js/Markdown.Sanitizer.js"></script>
 <script type="text/javascript" src="/static/js/Markdown.Editor.js"></script>
@@ -183,11 +184,13 @@
     {{end}}
     // 转换主帖
     var converter = new Markdown.Converter();
-    $('.entry-content').html(converter.makeHtml($('.entry-content').html()));
-
+    $('.entry-content').html($(converter.makeHtml($('.entry-content').html())).addClass('prettyprint'));
+    
     // 转换回复
     $('.reply-content').each(function(i){
-        $(this).html(converter.makeHtml($(this).html()));
+        if ($(this).html() != "") {
+            $(this).html($(converter.makeHtml($(this).html())).addClass('prettyprint'));
+        }
      });
 })();
 
@@ -231,12 +234,12 @@ $(function(){
         tid = otherTopics.data('tid'),
         nid = otherTopics.data('nid'),
         uri = '/topics/others/' + nid+'_'+tid+'.json';
-    $.get(uri, function(data){
+    $.getJSON(uri, function(data){
         if (!data.errno) {
             var topics = '';
-            for (var i in data.data) {
-                var topic = data.data[i];
-                topics += '<li><a href="/topics/"'+topic.tid+' title="'+topic.title+'">'+topic.title+'</a></li>';
+            for (var i in data.topics) {
+                var topic = data.topics[i];
+                topics += '<li><a href="/topics/'+topic.tid+'" title="'+topic.title+'">'+topic.title+'</a></li>';
             }
             if (topics == "") {
                 otherTopics.parent('div.box').hide();

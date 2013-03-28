@@ -180,6 +180,16 @@ func (this *Dao) FindAll(selectCol ...string) (*sql.Rows, error) {
 	return this.Query(strSql, this.whereVal...)
 }
 
+// 执行sql语句（查询语句）
+func (this *Dao) DoSql(strSql string, args ...interface{}) (*sql.Rows, error) {
+	err := this.Open()
+	if err != nil {
+		return nil, err
+	}
+	defer this.Close()
+	return this.Query(strSql, args...)
+}
+
 // 用于FindAll中，具体model在遍历rows时调用（提取的公共代码）
 func (this *Dao) Scan(rows *sql.Rows, colNum int, colFieldMap map[string]interface{}, selectCol ...string) error {
 	scanInterface := make([]interface{}, 0, colNum)

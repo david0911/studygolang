@@ -27,6 +27,7 @@ func FindObjComments(objid, objtype string, owner, lastCommentUid int /*, page, 
 	commentNum := len(commentList)
 	uids := make(map[int]int, commentNum+1)
 	uids[owner] = owner
+	uids[lastCommentUid] = lastCommentUid
 	for _, comment := range commentList {
 		uids[comment.Uid] = comment.Uid
 	}

@@ -81,7 +81,7 @@ func FindResource(id string) (resourceMap map[string]interface{}, comments []map
 
 // 获得某个分类的资源列表
 func FindResourcesByCatid(catid string) []map[string]interface{} {
-	resourceList, err := model.NewResource().Where("catid=" + catid).FindAll()
+	resourceList, err := model.NewResource().Where("catid=" + catid).Order("mtime DESC").FindAll()
 	if err != nil {
 		logger.Errorln("resource service FindResourcesByCatid error:", err)
 		return nil
@@ -127,6 +127,7 @@ func FindResourcesByCatid(catid string) []map[string]interface{} {
 	return resources
 }
 
+// 获得最新资源
 func FindRecentResources() []map[string]interface{} {
 	resourceList, err := model.NewResource().Limit("0,10").Order("mtime DESC").FindAll()
 	if err != nil {
@@ -147,6 +148,15 @@ func FindRecentResources() []map[string]interface{} {
 		resources[i] = tmpMap
 	}
 	return resources
+}
+
+// 资源总数
+func ResourcesTotal() (total int) {
+	total, err := model.NewResource().Count()
+	if err != nil {
+		logger.Errorln("resource service ResourcesTotal error:", err)
+	}
+	return
 }
 
 // 资源评论

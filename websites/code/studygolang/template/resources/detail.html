@@ -134,6 +134,7 @@
 {{end}}
 {{define "js"}}
 <script type="text/javascript" src="/static/js/topics.js"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
 <script type="text/javascript" src="/static/js/Markdown.Converter.js"></script>
 <script type="text/javascript" src="/static/js/Markdown.Sanitizer.js"></script>
 <script type="text/javascript" src="/static/js/Markdown.Editor.js"></script>
@@ -154,15 +155,17 @@
     
     topicEditor.run();
     {{end}}
-    // 转换主帖
+    // 转换资源
     var converter = new Markdown.Converter();
     {{if .resource.content}}
-    $('.entry-content').html(converter.makeHtml($('.entry-content').html()));
+    $('.entry-content').html($(converter.makeHtml($('.entry-content').html())).addClass('prettyprint'));
     {{end}}
 
     // 转换回复
     $('.reply-content').each(function(i){
-        $(this).html(converter.makeHtml($(this).html()));
+        if ($(this).html() != "") {
+            $(this).html($(converter.makeHtml($(this).html())).addClass('prettyprint'));
+        }
      });
 })();
 

@@ -42,6 +42,7 @@
 {{end}}
 {{define "js"}}
 <script type="text/javascript" src="/static/js/pages.js"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
 <script type="text/javascript" src="/static/js/Markdown.Converter.js"></script>
 <script type="text/javascript" src="/static/js/Markdown.Sanitizer.js"></script>
 <script type="text/javascript" src="/static/js/Markdown.Editor.js"></script>
@@ -50,7 +51,7 @@
 (function () {
     // 转换wiki
     var converter = new Markdown.Converter();
-    $('#content').html(converter.makeHtml($('#content').html()));
+    $('#content').html($(converter.makeHtml($('#content').html())).addClass('prettyprint'));
 })();
 </script>
 {{end}}

@@ -93,7 +93,7 @@ func UpdateUser(form url.Values) (errMsg string, err error) {
 	return
 }
 
-// 获取当前登录用户信息（常用信息）TODO:暂时只获取用户名、UID、是否是管理员
+// 获取当前登录用户信息（常用信息）TODO:暂时只获取用户名、UID、Email、是否是管理员
 func FindCurrentUser(username string) (user map[string]interface{}, err error) {
 	userLogin := model.NewUserLogin()
 	err = userLogin.Where("username=" + username).Find()
@@ -108,6 +108,7 @@ func FindCurrentUser(username string) (user map[string]interface{}, err error) {
 	user = map[string]interface{}{
 		"uid":      userLogin.Uid,
 		"username": userLogin.Username,
+		"email":    userLogin.Email,
 	}
 
 	// 获取角色信息
@@ -179,6 +180,7 @@ func FindUserByUsername(username string) *model.User {
 	return user
 }
 
+// 获得活跃用户
 func FindActiveUsers(start, num int) []*model.UserActive {
 	activeUsers, err := model.NewUserActive().Order("weight DESC").Limit(strconv.Itoa(start) + "," + strconv.Itoa(num)).FindAll()
 	if err != nil {
